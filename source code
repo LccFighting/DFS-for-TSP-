@@ -1,0 +1,78 @@
+#include<iostream>
+using namespace std;
+#include<vector>
+#include<fstream>
+int citynum=0;
+vector<int>cityname;
+int bestlen = 9999, currentlen = 0;
+vector<int>bestpace(100,0), currentpace(100,0);
+int Map[100][100];
+#define Noedge 0
+void dfs(int k);
+void swap(int &, int &);
+int main(){
+	
+	ifstream fin("c:/C_Project/data.txt");  //c从文件中读取城市距离 
+	cin >> citynum;
+	cout << endl;
+	cityname.push_back(0);
+	for (int i = 1; i <= citynum; i++){               //城市小标从1开始
+		cityname.push_back(i);                         //城市名用整数表示
+		for (int j = 1; j <= citynum; j++){
+
+			fin>>Map[i][j];
+			if (i == j) Map[i][j] = Noedge;
+		}
+	}
+	currentpace[1]=1;
+	dfs(2);
+	cout << bestlen << endl;
+	for (int j = 1; j <= citynum; j++){
+		cout << bestpace[j] << " ";
+	}
+
+	return 0;
+
+}
+void dfs(int k){
+	
+	if (k > citynum){
+		if (currentlen + Map[cityname[k - 1]][1] <= bestlen){
+			bestlen = currentlen + Map[cityname[k - 1]][1];
+			for (int t = 1; t <= citynum; t++){
+				bestpace[t] = currentpace[t];
+
+			}
+		}
+		return;
+	}
+	else{
+		for (int j = k; j <= citynum; j++){
+			swap(cityname[k], cityname[j]);
+			if ((Map[cityname[k - 1]][cityname[k]] != Noedge) && (currentlen + Map[cityname[k - 1]][cityname[k]] <= bestlen)){
+
+				currentlen += Map[cityname[k - 1]][cityname[k]];
+				currentpace[k] = cityname[k];
+				dfs(k + 1);
+				currentlen -= Map[cityname[k - 1]][cityname[k]];
+				currentpace[k] = 0;
+
+			}
+
+			swap(cityname[k], cityname[j]);
+
+		}
+	}
+}
+
+void swap(int &x, int &y){
+	int tmp;
+	tmp = x;
+	x = y;
+	y = tmp;
+	 
+
+}
+
+/* 总结：经过数据测试，dfs _tsp可以测试的最多 
+城市结点数为18个，当城市结点为20时，算法已经无法显示结果,算法时间复杂度为O (n!)
